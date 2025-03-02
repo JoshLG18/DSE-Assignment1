@@ -557,16 +557,16 @@ Africa and Asia have had considerable drops in IMR, indicating significant impro
 
 Healthcare expenditure rose significantly in 2022 in Europe and South America, most likely because of pandemic-related measures. This substantial rise in expenditure corresponds to an acceleration in IMR decreases, implying short-term healthcare gains.
 
-Overall, Figure 9 highlights regional differences in healthcare availability and efficiency. While investment is critical to lowering infant mortality, the impact of expenditure varies by location.
+Overall, Figure 9 illustrates regional differences in healthcare availability and efficiency. While investment is critical to lowering infant mortality, the impact of expenditure varies by location.
 
 **Conclusion**
 
-This analysis confirms a strong non-linear negative relationship between healthcare expenditure and infant mortality rates across global regions. Countries with higher healthcare investment generally experience lower infant mortality, though the impact varies based on economic and healthcare infrastructure factors.
+In conclusion, there is a strong non-linear negative relationship between healthcare expenditure and infant mortality rates across global regions. Countries with higher healthcare investment generally experience lower infant mortality, though the impact varies based on economic and healthcare infrastructure factors.
 
-The non-linear nature of this relationship indicates diminishing returns, where initial increases in spending lead to substantial improvements, but further investments yield smaller reductions in infant mortality. Regression and time-series analyses further reinforce this pattern, highlighting long-term declines in infant mortality alongside growing healthcare expenditure.
+The non-linear nature of this relationship indicates diminishing returns, where initial increases in spending lead to substantial improvements, but further investments yield smaller reductions in infant mortality. Regression and time-series analyses further reinforce this pattern, indicating long-term declines in infant mortality alongside growing healthcare expenditure.
 
-Regional disparities remain significant, with high-income regions investing more per capita while achieving lower mortality rates, whereas lower-income regions show greater relative improvements despite lower absolute expenditure. The 2022 anomaly suggests short-term shifts in healthcare spending and outcomes, likely due to pandemic-driven policies.
+Regional disparities are present, with high-income regions investing more per capita while achieving lower mortality rates, whereas lower-income regions show greater relative improvements despite lower absolute expenditure. The 2022 anomaly suggests short-term shifts in healthcare spending and outcomes, likely due to pandemic-driven policies.
 
-While healthcare expenditure is a crucial driver of infant mortality rates, efficient allocation, accessibility, and policy effectiveness remain key determinants of long-term health improvements worldwide.
+While healthcare expenditure is an important driver of infant mortality rates, efficient allocation, accessibility, and policy effectiveness remain key determinants of long-term health improvements worldwide.
 
 ### Link to GitHub Repository = https://github.com/JoshLG18/DSE-Assignment1
