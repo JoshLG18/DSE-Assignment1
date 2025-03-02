@@ -1,0 +1,582 @@
+---
+title: "Question 3 + 4"
+author: "720017170"
+format: pdf
+execute:
+    echo: false
+    warning: false
+    message: false
+    results: false
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import pearsonr
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score
+import statsmodels.api as sm
+from scipy.optimize import curve_fit
+from sklearn.preprocessing import PolynomialFeatures
+
+```
+
+### Question 3 - See QMD for Code
+
+**(a) Import each dataset into memory as a separate data frame, keeping all countries as your sample.**
+
+```{python}
+#| echo: true
+
+plt.rcParams.update({'font.size': 14})
+
+# Loading in the Data
+Health_Data = pd.read_csv('Data/Health.csv', index_col=None)
+Infant_Data = pd.read_csv("Data/Infant.csv",index_col=None)
+
+# Replace .. with NA
+Health_Data.replace("..", pd.NA, inplace=True)
+Infant_Data.replace("..", pd.NA, inplace=True)
+
+# Removing unnecessary columns
+Health_Data = Health_Data.drop(columns=['Series Name', 'Series Code'])
+Infant_Data = Infant_Data.drop(columns=['Series Name', 'Series Code'])
+
+# Remove names in []
+Health_Data.columns = Health_Data.columns.str.replace(r'\[.*\]', '', regex=True)
+Infant_Data.columns = Infant_Data.columns.str.replace(r'\[.*\]', '', regex=True)
+
+print(Infant_Data.head())
+print(Health_Data.head())
+```
+
+\newpage
+
+**(b) If data are not already stored in this way, please reshape data so that they consist of a single line of data for each country and year.**
+
+```{python}
+#| echo: true
+
+# Pivoting the Data into a long format
+Health_Data_long = pd.melt(Health_Data, 
+        id_vars=['Country Name', 'Country Code'], 
+        var_name='Year', 
+        value_name='Heathcare Expenditure (USD)')
+Infant_Data_long = pd.melt(Infant_Data, 
+        id_vars=['Country Name', 'Country Code'], 
+        var_name='Year', 
+        value_name='Infant Mortality Rates (per 1,000 live births)')
+```
+
+```{python}
+Health_Data_long.head() # Print the first 5 rows of the pivoted dataset
+```
+
+```{python}
+Infant_Data_long.head() # Print the first 5 rows of the pivoted dataset
+```
+
+**(c) Calculate the total number of countries observed in each data frame Calculate the total number of years observed in each data frame.**
+
+```{python}
+#| echo: true
+
+# Counts the number of unique contries
+num_countries_FDI = Health_Data_long["Country Name"].nunique() 
+
+# Outputs the number of unique countries using an f string
+print(f"Total number of unique countries in Health_Data: {num_countries_FDI}")
+
+num_years_FDI = Health_Data_long["Year"].nunique() # Counts the number of unique years
+print(f"Total number of unique years observed in Health_Data: {num_years_FDI}")
+
+num_countries_GDP = Infant_Data_long["Country Name"].nunique()
+print(f"Total number of unique countries in Infant_Data: {num_countries_GDP}")
+
+num_years_GDP = Infant_Data_long["Year"].nunique()
+print(f"Total number of unique years observed in Infant_Data: {num_years_GDP}")
+```
+
+**(d) Calculate the number of observations for which data is missing**
+
+```{python}
+#| echo: true
+
+# Sums the number of missing values in each dataset
+missing_values_Health = Health_Data_long.isna().sum().sum()
+print(f"Total missing observations in Health_Data: {missing_values_Health}")
+
+missing_values_Infant = Infant_Data_long.isna().sum().sum()
+print(f"Total missing observations in Infant_Data: {missing_values_Infant}")
+
+# Create a dataframe showing the number of missing values for each dataset
+missing_values_table = pd.DataFrame({
+    'Dataset': ['Health_Data', 'Infant_Data'],
+    'Total Missing Observations': [missing_values_Health, missing_values_Infant]
+})
+
+
+```
+
+**(e) Join the two files by country and year so that you have single dataframe containing both variables. Explain clearly what type of join this is, and carefully check that the number of observations resulting from the join makes sense.**
+
+```{python}
+#| echo: true
+
+# Merge the data on Country Name, Country code and Year
+merged_data = pd.merge(Health_Data_long, Infant_Data_long, on=['Country Name', 
+'Country Code', 'Year'])
+print(merged_data.head())
+
+# Print the number of rows in the DataFrame
+num_rows = merged_data.shape[0]
+print(f"Number of rows in the DataFrame: {num_rows}")
+
+```
+
+The join completed in the above code chunk is an inner join and only keeps rows that exist in both Health_Data_long and Infant_Data_long. If a country-year exists in one dataset but not the other, it will be dropped.
+
+\newpage
+
+### Question 4 - Investigating the Relationship Between Current Healthcare Expenditure per capita and Infant Mortality Rates from 2000 - 2022
+
+**Missing Data - Table 1**
+
+```{python}
+# Output the table with counts of missing values
+missing_values_table
+```
+
+Both datasets contained a considerable amount of missing data, illustrated in Table 1. Potentially due to countries not collecting the data or collecting the data at different year intervals. Missing data can have a large impact on data analysis if not handled properly and can lead to skewed or incorrect conclusions. The year 2023 contained no data; therefore, this column was dropped. To deal with the other missing data, I decided to drop all rows containing missing data, sometimes, this could result in a significant reduction of sample size; however, in this case, 1099 observations were removed (21.1% of the dataset) and only 27 countries were dropped, indicating this was an effective method to handling missing data as there were still 4109 observations. An alternative approach would’ve been mean, multiple or regression imputation if dropping rows with missing data caused a significant decrease in sample size.
+
+```{python}
+# Removing any rows with missing data to clean the dataset
+num_countries_before = merged_data["Country Name"].nunique()
+
+cleaned_data = merged_data.dropna() # Drops all rows where duplicates occur
+
+# 2023 had no data so the count of years goes down to 23
+num_years = cleaned_data["Year"].nunique()
+#print(f"Total number of unique years observed in cleaned: {num_years}")
+
+# Allows summary of how many countries were lost
+num_countries_after = cleaned_data["Country Name"].nunique()
+countries_removed = num_countries_before - num_countries_after
+
+
+#print(f"Number of countries before removing NAs: {num_countries_before}")
+#print(f"Number of countries after removing NAs: {num_countries_after}")
+#print(f"Number of countries removed: {countries_removed}")
+
+
+# Ensure all columns are in the correct types
+cleaned_data['Country Name'] = cleaned_data['Country Name'].astype(str)
+cleaned_data['Country Code'] = cleaned_data['Country Code'].astype(str)
+cleaned_data['Year'] = cleaned_data['Year'].astype('category')
+cleaned_data['Heathcare Expenditure (USD)'] = cleaned_data['Heathcare Expenditure (USD)'].astype(float).round(3)
+cleaned_data['Infant Mortality Rates (per 1,000 live births)'] = cleaned_data['Infant Mortality Rates (per 1,000 live births)'].astype(float).round(3)
+
+```
+
+**Summary Statistics - Table 2**
+
+```{python}
+## Compute summary statistics
+summary_stats = cleaned_data.describe().transpose()
+summary_stats = summary_stats[['count', 'mean', '50%', 'std', 'min', 'max']]
+summary_stats.columns = ['N', 'Mean', 'Median', 'SD', 'Min', 'Max']
+summary_stats.index.name = "Variable"
+
+# Round values for better readability and format as strings for LaTeX output
+summary_stats = summary_stats.round(1).astype(str)
+
+summary_stats
+
+```
+
+Table 2 displays the summary statistics for healthcare expenditure (USD) and infant mortality rates (per 1,000 live births) across 4109 observations, revealing significant differences between countries.
+
+Healthcare expenditure per capita showed a mean of \$956.0 but a far lower median of \$256.7, indicating a negatively skewed distribution where few countries spend significantly more. The large standard deviation (\$1,685.7) and range (\$4.0–\$12,473.8) highlight large global and temporal differences in healthcare investment.
+
+Infant mortality rates show similar variation, with a mean of 26.9 deaths per 1,000 live births and a median of 17.7. The high standard deviation (25.0) and range (1.4–138.3) suggest major differences in healthcare quality and access.
+
+Overall, the data indicates global differences in healthcare funding and outcomes, suggesting that higher healthcare expenditure may be linked to lower infant mortality.
+
+\newpage
+
+**Distribution Analysis**
+
+```{python}
+# Healthcare Expenditure
+plt.figure(figsize=(10, 4))
+sns.boxplot(y=cleaned_data["Heathcare Expenditure (USD)"], color='blue')
+plt.figtext(0.5, 0.03, "Figure 1: Box Plot of Healthcare Spend Per Capita (USD)", ha="center", fontsize=11)
+plt.show()
+
+plt.figure(figsize=(10, 4))
+sns.histplot(cleaned_data["Heathcare Expenditure (USD)"], bins=30, kde=True, color='blue')
+plt.figtext(0.5, -0.06, "Figure 2: Histogram with Density of Healthcare Spend Per Capita (USD)", ha="center", fontsize=11)
+plt.xlabel("Healthcare Spend Per Capita (USD)")
+plt.show()
+```
+
+Figures 1 and 2 show the distribution of healthcare spending per capita (USD). Figure 1 shows that healthcare expenditure is highly negatively skewed, with many outliers at the upper end, supporting the analysis from the summary statistics. The median expenditure is positioned toward the lower end of the distribution, indicating that most countries spend relatively little, while a few spend significantly more. The whiskers of the box plot are short, suggesting that a large proportion of the data is concentrated within a lower range, while the numerous outliers highlight extreme spending levels in some countries.
+
+Figure 2 reiterates the negative skew of the data. Most countries have low healthcare spending, grouped toward the left of the axis, with just a handful having exceptionally high expenditures. The density curve (smooth blue line) shows the exponential drop in frequency as expenditure increases, emphasising that high-spending countries are exceptions rather than the rule
+
+```{python}
+plt.rcParams.update({'font.size': 11})
+
+# IMR
+plt.figure(figsize=(10, 4))
+sns.boxplot(y=cleaned_data["Infant Mortality Rates (per 1,000 live births)"], color='green')
+plt.figtext(0.5, 0.03, "Figure 3: Box Plot of Infant Mortality Rate (per 1,000 live births)", ha="center", fontsize=9)
+plt.show()
+
+plt.figure(figsize=(10, 4))
+sns.histplot(cleaned_data["Infant Mortality Rates (per 1,000 live births)"], bins=30, kde=True, color='green')
+plt.figtext(0.5, -0.05, "Figure 4: Histogram with Density of Infant Mortality Rate (per 1,000 live births)", ha="center", fontsize=9)
+plt.xlabel("Infant Mortality Rate (per 1,000 live births)")
+plt.show()
+
+plt.rcParams.update({'font.size': 14})
+
+```
+
+The distribution of the infant mortality rate (per 1,000 live births) seen in Figures 3 and 4 is comparable to that of healthcare spend per capita (USD).
+
+There are several outliers in Figure 3, with specific countries having abnormally high infant mortality rates. The data is still negatively skewed, as seen by the median being significantly lower than the upper quartile.
+
+This is supported by Figure 4, which displays a dramatic fall in frequency as rates rise, with most values clustering below 40 deaths per 1,000 live births. While infant mortality is low in many nations, it is much higher in others, most likely because of infrastructural constraints, economic considerations, and healthcare discrepancies.
+
+Due to the number of outliers within both variables, I decided to use the Interquartile Range (IQR) method to remove any outliers to ensure a more accurate and reliable regression analysis.
+
+Outliers can skew the model fit, disproportionately influence regression coefficients, and inflate evaluation metrics such as RMSE. By applying the IQR method, I ensure that the data represents a more consistent trend, reducing the impact of extreme values and improving the model's ability to capture the true relationship between healthcare expenditure and infant mortality rates.
+
+
+```{python}
+# Removing Outliers
+
+# Calculate the IQR for Healthcare Expenditure and Infant Mortality Rates
+Q1_healthcare = cleaned_data["Heathcare Expenditure (USD)"].quantile(0.25)
+Q3_healthcare = cleaned_data["Heathcare Expenditure (USD)"].quantile(0.75)
+IQR_healthcare = Q3_healthcare - Q1_healthcare
+
+Q1_infant_mortality = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].quantile(0.25)
+Q3_infant_mortality = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].quantile(0.75)
+IQR_infant_mortality = Q3_infant_mortality - Q1_infant_mortality
+
+# Define the lower and upper bounds for outliers
+lower_bound_healthcare = Q1_healthcare - 1.5 * IQR_healthcare
+upper_bound_healthcare = Q3_healthcare + 1.5 * IQR_healthcare
+
+lower_bound_infant_mortality = Q1_infant_mortality - 1.5 * IQR_infant_mortality
+upper_bound_infant_mortality = Q3_infant_mortality + 1.5 * IQR_infant_mortality
+
+# Filter the dataset to remove outliers
+cleaned_data = cleaned_data[
+    (cleaned_data["Heathcare Expenditure (USD)"] >= lower_bound_healthcare) &
+    (cleaned_data["Heathcare Expenditure (USD)"] <= upper_bound_healthcare) &
+    (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] >= lower_bound_infant_mortality) &
+    (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] <= upper_bound_infant_mortality)
+]
+
+```
+
+
+**Correlation Analysis**
+
+```{python}
+numerical_data = cleaned_data.select_dtypes(include=[np.number])
+
+# Calculate the Spearman rank correlation matrix
+correlation_matrix = numerical_data.corr(method='spearman')
+
+# Plot the heatmap
+plt.figure(figsize=(10, 4))
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5, square=True)
+plt.figtext(0.5, -1.05, "Figure 5: Spearman Rank Correlation Matrix of Healthcare Expenditure and Infant Mortality Rates", ha="center", fontsize=14)
+plt.show()
+```
+
+Figure 5 illistrates the relationship between heathcare expenditure and infant mortality rates. The correlation coefficient of -0.82 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates tend to decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved maternal care, and reduced infant deaths. The Spearman correlation is particularly useful here as it captures non-linear relationships, making it more robust to potential outliers compared to Pearson’s correlation. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could influence this relationship.
+
+
+**Regression Analysis**
+
+```{python}
+
+# Prepare data
+X = cleaned_data["Heathcare Expenditure (USD)"].to_numpy(dtype=float)
+y = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].to_numpy(dtype=float)
+
+
+## Create X values for smooth curve plotting
+X_range = np.linspace(min(X), max(X)).reshape(-1, 1)
+
+# Exponential Regression 
+def exponential_model(x, a, b): # A = y-intercept,  B = decay rate
+    return np.maximum(a * np.exp(b * x), 0)  # Limit at 0
+
+# Estimate best values of a and b
+popt, _ = curve_fit(exponential_model, X, y, p0=(1, -0.001))
+
+# Extract the optimal values or a and b
+a_exp, b_exp = popt
+
+# Uses best a and b to predict IMR
+y_pred_exp_plot = np.maximum(exponential_model(X_range.flatten(), a_exp, b_exp), 0)
+
+
+# Polynomial Regression 
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X.reshape(-1, 1)) # Reshape X into a 2D array
+X_range_poly = poly.transform(X_range) #Generates polynomial features
+poly_model = LinearRegression().fit(X_poly, y) # fits the model using linear regression
+
+# Get predictions and enforce a non-increasing trend
+y_pred_poly = poly_model.predict(X_poly)
+y_pred_poly_plot = poly_model.predict(X_range_poly)
+
+# Ensure polynomial predictions do not increase after reaching zero
+y_pred_poly_plot[y_pred_poly_plot < 0] = 0  # Prevent negative values
+y_pred_poly_plot[np.diff(y_pred_poly_plot, prepend=y_pred_poly_plot[0]) > 0] = 0  # Prevent increasing trend
+
+# Generate performance metrics
+r2_poly = r2_score(y, y_pred_poly)
+
+
+#Logarithmic Regression
+def log_model(x, a, b): # a = intercept, b = change coefficient
+    return np.maximum(a + b * np.log(x + 1), 0)  # Avoid log(0) error, limit at 0
+
+popt, _ = curve_fit(log_model, X, y, p0=(1, 1)) # finds the best fit of a and b
+a_log, b_log = popt # extracts best fit variables
+
+#generates predictions of IMR using best fit a and b
+y_pred_log_plot = np.maximum(log_model(X_range.flatten(), a_log, b_log), 0) 
+
+
+# Power Law Regression 
+def power_model(x, a, b): # a = scaling factor, b = power exponent/rate of change
+    return np.maximum(a * np.power(x, b), 0)  # Limit at 0
+
+# Find best values of a and b
+popt, _ = curve_fit(power_model, X[X > 0], y[X > 0], p0=(1, -1)) # limit values to X > 0
+a_pow, b_pow = popt # extracts best fit variables
+
+# Generate predictions
+y_pred_pow = power_model(X, a_pow, b_pow)
+
+# Generate predictions for plotting
+y_pred_pow_plot = power_model(X_range.flatten(), a_pow, b_pow)
+
+#Linear Regression (Benchmark)
+linear_model = LinearRegression().fit(X.reshape(-1, 1), y)
+y_pred_lin_plot = np.maximum(linear_model.predict(X_range), 0)  # Limit at 0
+
+# Compute R2 and MAE for each model
+def compute_metrics(y_true, y_pred):
+    return r2_score(y_true, y_pred), mean_absolute_error(y_true, y_pred)
+
+metrics = {
+    "Exponential": compute_metrics(y, exponential_model(X, a_exp, b_exp)),
+    "Logarithmic": compute_metrics(y, log_model(X, a_log, b_log)),
+    "Power Law": compute_metrics(y[X > 0], power_model(X[X > 0], a_pow, b_pow)),
+    "Polynomial": compute_metrics(y, poly_model.predict(X_poly)),
+    "Linear": compute_metrics(y, linear_model.predict(X.reshape(-1, 1))),
+}
+
+# Plot the Regression Comparisons 
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x=X, y=y, label="Actual Data", color="gray", alpha=0.5)
+
+plt.plot(X_range, y_pred_exp_plot, color="red", label=f"Exponential (R²: {metrics['Exponential'][0]:.2f}, MAE: {metrics['Exponential'][1]:.2f})")
+plt.plot(X_range, y_pred_poly_plot, color="blue", label=f"Polynomial (R²: {metrics['Polynomial'][0]:.2f}, MAE: {metrics['Polynomial'][1]:.2f})")
+plt.plot(X_range, y_pred_log_plot, color="purple", label=f"Logarithmic (R²: {metrics['Logarithmic'][0]:.2f}, MAE: {metrics['Logarithmic'][1]:.2f})")
+plt.plot(X_range, y_pred_pow_plot, color="green", label=f"Power Law (R²: {metrics['Power Law'][0]:.2f}, MAE: {metrics['Power Law'][1]:.2f})")
+plt.plot(X_range, y_pred_lin_plot, color="orange", linestyle="dashed", label=f"Linear (R²: {metrics['Linear'][0]:.2f}, MAE: {metrics['Linear'][1]:.2f})")
+
+plt.figtext(0.5, -0.01, "Figure 6: Comparison of Regression Models: Healthcare Spend vs Infant Mortality Rate", ha="center", fontsize=11)
+plt.xlabel("Healthcare Spend Per Capita (USD)")
+plt.ylabel("Infant Mortality Rate")
+plt.legend()
+plt.show()
+```
+
+Figure 6 compares five regression models, exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare spend per capita and infant mortality rates. The power law model achieves the best fit with an R² of 0.61, revealing that 61% of the variance in infant mortality rates is explained by healthcare spending per capita, and the lowest mean absoloute error (MAE) of 10.47, supporting the strong inverse relationship shown in Figure 5. Exponential and logarithmic regression perform well (R² = 0.61 and 0.56, respectively), capturing the steep initial decline before stabilizing at lower mortality levels.
+
+Polynomial regression initially follows the trend but ultimately performs poorly, indicated by its lower R² of 0.48. The linear model performs worst, failing to capture the non-linearity of the data. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. This analysis highlights that non-linear models, particularly power law and exponential regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare spend per capita and infant mortality rates.
+
+\newpage
+
+**Regression Model Evaluation**
+
+```{python}
+import statsmodels.api as sm
+
+# Calculate residuals
+residuals = y - y_pred_pow
+
+# Residual Plot
+plt.figure(figsize=(10, 4))
+plt.scatter(y_pred_pow, residuals, alpha=0.5)
+plt.axhline(0, color='red', linestyle='--')
+plt.xlabel('Fitted values')
+plt.ylabel('Residuals')
+plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="center", fontsize=11)
+plt.show()
+```
+
+The residual plot (Figure 7) for the power law regression model highlights some issues with the model’s fit. The residuals display a noticeable pattern rather than being randomly scattered, suggesting heteroscedasticity—where the variance of residuals increases with fitted values. This indicates that the model performs well at lower levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. The presence of extreme residuals also suggests potential outliers influencing the model. To address these issues, applying a log transformation to the dependent variable or exploring alternative regression techniques, such as Generalized Least Squares (GLS), may help improve the model’s fit.
+
+**Time Series Analysis**
+
+```{python}
+# Group data and calculate mean
+mean_data = cleaned_data.groupby('Year').agg({
+    'Infant Mortality Rates (per 1,000 live births)': 'mean',
+    'Heathcare Expenditure (USD)': 'mean'
+}).reset_index()
+
+# Rename columns for clarity
+mean_data.columns = ['Year', 'Mean Infant Mortality Rates (per 1,000 live births)', 'Mean Healthcare Expenditure (USD)']
+
+# Round the mean values to 3 decimal places
+mean_data = mean_data.round(3)
+
+# Plot the mean data on different scales
+fig, ax1 = plt.subplots(figsize=(12, 5))
+
+# Plot Mean Infant Mortality Rates
+ax1.set_xlabel('Year')
+ax1.set_ylabel('Mean Infant Mortality Rates (per 1,000 live births)', color='tab:blue')
+line1, = ax1.plot(mean_data['Year'], mean_data['Mean Infant Mortality Rates (per 1,000 live births)'], 
+                   marker='o', color='tab:blue', label='Mean Infant Mortality Rates (per 1,000 live births)')
+ax1.tick_params(axis='y', labelcolor='tab:blue')
+
+# Create a secondary y-axis
+ax2 = ax1.twinx()
+ax2.set_ylabel('Mean Healthcare Expenditure (USD)', color='tab:green')
+line2, = ax2.plot(mean_data['Year'], mean_data['Mean Healthcare Expenditure (USD)'], 
+                   marker='o', color='tab:green', label='Mean Healthcare Expenditure (USD)')
+ax2.tick_params(axis='y', labelcolor='tab:green')
+
+# Combine legends into one
+lines = [line1, line2]
+labels = [line.get_label() for line in lines]
+fig.legend(lines, labels, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False)
+plt.tick_params(axis='x', rotation=45)
+plt.setp(ax1.get_xticklabels(), rotation=45, ha="right")
+
+# Add figure legend
+plt.figtext(0.5, -0.01, "Figure 8: Time Series Analysis of Mean Infant Mortality Rates and Healthcare Expenditure", ha="center", fontsize=14)
+fig.tight_layout()
+
+plt.show()
+```
+
+Figure 8 illustrates the negative association between mean infant mortality rates (IMR) and mean healthcare spending (USD) from 2000 to 2022. The trend indicates a continual drop in IMR, reflecting improvements in healthcare, economic development, and medical advances. Meanwhile, healthcare spending has steadily climbed, indicating greater investment in health infrastructure and services.
+
+A noteworthy anomaly arises in 2022 when healthcare expenditures significantly increase and infant death rates significantly decrease. This large shift may be due to pandemic-related spending, emergency health interventions, or data errors. The high rise in expenditure may signal a significant policy shift, but further research is needed to assess the long-term consequences.
+
+Overall, Figure 8 reinforces the strong negative correlation between healthcare investment and infant mortality rates illustrated by Figures 5 and 6. However, the presence of diminishing returns suggests that beyond a certain threshold, additional spending alone may not yield proportional improvements, emphasizing the need for efficient resource allocation and targeted healthcare policies to maximize impact.
+
+```{python}
+plt.rcParams.update({'font.size': 55})
+
+
+# Load in dataset with countries and continents
+continents = pd.read_csv('Data/Continents.csv')
+
+
+# Join continents to cleaned data
+cleaned_data = pd.merge(cleaned_data, continents, left_on='Country Name', right_on='Country')
+cleaned_data = cleaned_data.drop(columns=['Country', 'Year_y', 'Code','time'])
+
+# Group by continent and year to compute mean values
+mean_data_by_continent = cleaned_data.groupby(['Continent', 'Year_x']).agg({
+    'Infant Mortality Rates (per 1,000 live births)': 'mean',
+    'Heathcare Expenditure (USD)': 'mean'
+}).reset_index()
+
+# Rename columns for clarity
+mean_data_by_continent.columns = ['Continent', 'Year', 'Mean Infant Mortality Rates (per 1,000 live births)', 'Mean Healthcare Expenditure (USD)']
+
+# Define grid layout
+continents = mean_data_by_continent['Continent'].unique()
+nrows, ncols = 3, 2
+fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(70,80))
+axes = axes.flatten()
+
+# Determine global axis limits
+infant_mortality_min, infant_mortality_max = mean_data_by_continent['Mean Infant Mortality Rates (per 1,000 live births)'].min(), mean_data_by_continent['Mean Infant Mortality Rates (per 1,000 live births)'].max()
+healthcare_expenditure_min, healthcare_expenditure_max = mean_data_by_continent['Mean Healthcare Expenditure (USD)'].min(), mean_data_by_continent['Mean Healthcare Expenditure (USD)'].max()
+
+def set_axes_limits(ax, ax2):
+    ax.set_ylim(infant_mortality_min, infant_mortality_max)
+    ax2.set_ylim(healthcare_expenditure_min, healthcare_expenditure_max)
+
+for i, continent in enumerate(continents):
+    ax = axes[i]
+    continent_data = mean_data_by_continent[mean_data_by_continent['Continent'] == continent]
+    
+    # Plot Infant Mortality Rate
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Mean Infant Mortality Rates (per 1,000 live births)', color='tab:blue')
+    ax.plot(continent_data['Year'], continent_data['Mean Infant Mortality Rates (per 1,000 live births)'], 
+            marker='o', color='tab:blue', label='Mean Infant Mortality Rates')
+    ax.tick_params(axis='y', labelcolor='tab:blue')
+
+    # Create a secondary y-axis for Healthcare Expenditure
+    ax2 = ax.twinx()
+    ax2.set_ylabel('Mean Healthcare Expenditure (USD)', color='tab:green')
+    ax2.plot(continent_data['Year'], continent_data['Mean Healthcare Expenditure (USD)'], 
+             marker='o', color='tab:green', label='Mean Healthcare Expenditure')
+    ax2.tick_params(axis='y', labelcolor='tab:green')
+    
+    # Set uniform axis limits
+    set_axes_limits(ax, ax2)
+    
+    # Title for each subplot
+    ax.set_title(f'Time Series for {continent}')
+
+    # Angle x axis labels
+    ax.tick_params(axis='x', rotation=45)
+
+# Adjust layout
+plt.figtext(0.5, -0.01, "Figure 9: Time Series Analysis of Mean Infant Mortality Rates and Healthcare Expenditure By Continent", ha="center", fontsize=80)
+plt.tight_layout()
+plt.show()
+plt.rcParams.update({'font.size': 14})
+
+```
+
+Figure 9 shows continent-specific trends in IMR and mean healthcare spending (USD) from 2000 to 2022. The constant negative relationship across each location suggests an association between increasing healthcare investment and reduced infant mortality.
+
+Africa and Asia have had considerable drops in IMR, indicating significant improvements in healthcare despite relatively little investment. Europe and North America, with larger beginning expenditures, experienced lower IMR decreases, indicating declining returns on investment. South America and Oceania follow similar trends but have different purchasing preferences.
+
+Healthcare expenditure rose significantly in 2022 in North and South America, most likely because of pandemic-related measures. This substantial rise in spending corresponds to a transient acceleration in IMR decreases, implying short-term healthcare gains.
+
+Overall, Figure 9 highlights regional differences in healthcare availability and efficiency. While investment is critical to lowering infant mortality, the impact of expenditure varies by location.
+
+**Conclusion**
+
+This analysis confirms a strong non-linear negative relationship between healthcare expenditure and infant mortality rates across global regions. Countries with higher healthcare investment generally experience lower infant mortality, though the impact varies based on economic and healthcare infrastructure factors.
+
+The non-linear nature of this relationship indicates diminishing returns, where initial increases in spending lead to substantial improvements, but further investments yield smaller reductions in infant mortality. Logarithmic and time-series analyses further reinforce this pattern, highlighting long-term declines in infant mortality alongside growing healthcare expenditure.
+
+Regional disparities remain significant, with high-income regions investing more per capita while achieving lower mortality rates, whereas lower-income regions show greater relative improvements despite lower absolute spending. The 2022 anomaly suggests short-term shifts in healthcare spending and outcomes, likely due to pandemic-driven policies.
+
+While healthcare expenditure is a crucial driver of infant survival, efficient allocation, accessibility, and policy effectiveness remain key determinants of long-term health improvements worldwide.
+
+```{python}
+print("hello world")
+```
+
+
+
+
+**Link to GitHub Repository = https://github.com/JoshLG18/DSE-Assingment**
