@@ -116,8 +116,6 @@ missing_values_table = pd.DataFrame({
     'Dataset': ['Health_Data', 'Infant_Data'],
     'Total Missing Observations': [missing_values_Health, missing_values_Infant]
 })
-
-
 ```
 
 **(e) Join the two files by country and year so that you have single dataframe containing both variables. Explain clearly what type of join this is, and carefully check that the number of observations resulting from the join makes sense.**
@@ -140,7 +138,7 @@ The join completed in the above code chunk is an inner join and only keeps rows 
 
 \newpage
 
-### Question 4 - Investigating the Relationship Between Current Healthcare Expenditure per capita and Infant Mortality Rates from 2000 - 2022
+### Question 4 - Investigating the Relationship Between Current Healthcare Expenditure per Capita and Infant Mortality Rates from 2000 - 2022
 
 **Missing Data - Table 1**
 
@@ -165,11 +163,9 @@ num_years = cleaned_data["Year"].nunique()
 num_countries_after = cleaned_data["Country Name"].nunique()
 countries_removed = num_countries_before - num_countries_after
 
-
 #print(f"Number of countries before removing NAs: {num_countries_before}")
 #print(f"Number of countries after removing NAs: {num_countries_after}")
 #print(f"Number of countries removed: {countries_removed}")
-
 
 # Ensure all columns are in the correct types
 cleaned_data['Country Name'] = cleaned_data['Country Name'].astype(str)
@@ -177,7 +173,6 @@ cleaned_data['Country Code'] = cleaned_data['Country Code'].astype(str)
 cleaned_data['Year'] = cleaned_data['Year'].astype('category')
 cleaned_data['Heathcare Expenditure (USD)'] = cleaned_data['Heathcare Expenditure (USD)'].astype(float).round(3)
 cleaned_data['Infant Mortality Rates (per 1,000 live births)'] = cleaned_data['Infant Mortality Rates (per 1,000 live births)'].astype(float).round(3)
-
 ```
 
 **Summary Statistics - Table 2**
@@ -193,16 +188,15 @@ summary_stats.index.name = "Variable"
 summary_stats = summary_stats.round(1).astype(str)
 
 summary_stats
-
 ```
 
 Table 2 displays the summary statistics for healthcare expenditure (USD) and infant mortality rates (per 1,000 live births) across 4109 observations, revealing significant differences between countries.
 
-Healthcare expenditure per capita showed a mean of \$956.0 but a far lower median of \$256.7, indicating a negatively skewed distribution where few countries expenditure significantly more. The large standard deviation (\$1,685.7) and range (\$4.0–\$12,473.8) highlight large global differences in healthcare investment.
+Healthcare expenditure per capita showed a mean of \$956.0 but a lower median of \$256.7, indicating a negatively skewed distribution where few countries expenditure significantly more. The large standard deviation (\$1,685.7) and range (\$4.0–\$12,473.8) highlight large global differences in healthcare investment.
 
-Infant mortality rates show similar variation, with a mean of 26.9 deaths per 1,000 live births and a median of 17.7. The high standard deviation (25.0) and range (1.4–138.3) suggest major differences in healthcare investment and quality.
+Infant mortality rates show similar variation, with a mean of 26.9 deaths per 1,000 live births and a median of 17.7. The high standard deviation (25.0) and range (1.4–138.3) may be attributed to major differences in healthcare investment and quality.
 
-Overall, the data indicates global differences in healthcare investment and outcomes, suggesting that higher healthcare expenditure may be linked to lower infant mortality.
+Finally, the data indicates global differences in healthcare investments and mortality rates, suggesting that higher healthcare expenditure may be linked to lower infant mortality.
 
 \newpage
 
@@ -224,7 +218,7 @@ plt.show()
 
 Figures 1 and 2 show the distribution of healthcare expenditure per capita (USD). Figure 1 shows that healthcare expenditure is highly negatively skewed, with many outliers at the upper end, supporting the analysis from the summary statistics. The median expenditure is positioned toward the lower end of the distribution, indicating that most countries expenditure relatively little, while a few spending significantly more. The whiskers of the box plot are short, suggesting that a large proportion of the data is concentrated within a lower range, while the numerous outliers highlight extreme expenditure levels in some countries.
 
-Figure 2 reiterates the negative skew of the data. Most countries have low healthcare expenditure, grouped toward the left of the axis, with just a handful having exceptionally high expenditures. The density curve (smooth blue line) shows the exponential drop in frequency as expenditure increases, emphasising that high-spending countries are exceptions rather than the rule
+Figure 2 reiterates the negative skew of the data. Most countries have low healthcare expenditure, grouped toward the left of the axis, with just a handful having exceptionally high expenditures. The density curve (smooth blue line) shows the exponential drop in frequency as expenditure increases, emphasising that high-spending countries are exceptions rather than the rule.
 
 ```{python}
 plt.rcParams.update({'font.size': 11})
@@ -247,7 +241,7 @@ plt.rcParams.update({'font.size': 14})
 
 The distribution of the infant mortality rate (per 1,000 live births) seen in Figures 3 and 4 is similar to that of healthcare expenditure per capita (USD).
 
-There are several outliers in Figure 3, with specific countries having abnormally high infant mortality rates. The data is still negatively skewed, as seen by the median being significantly lower than the upper quartile.
+There are several outliers in Figure 3, with specific countries having abnormally high infant mortality rates. The variable is again negatively skewed, as seen by the median being significantly lower than the upper quartile.
 
 This is supported by Figure 4, which displays a dramatic fall in frequency as rates rise, with most values clustering below 40 deaths per 1,000 live births. While infant mortality is low in many nations, it is much higher in others, most likely because of infrastructural constraints, economic considerations, and healthcare discrepancies.
 
@@ -403,9 +397,11 @@ plt.legend()
 plt.show()
 ```
 
-Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. The power law model achieves the best fit with an R² of 0.61, revealing that 61% of the variance in infant mortality rates is explained by healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 10.47, supporting the inverse relationship shown in Figure 5. Exponential and logarithmic regression perform well (R² = 0.61 and 0.56, respectively), capturing the steep initial decline before stabilizing at lower mortality levels.
+Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. The linear model performs worst (R² = 0.33), failing to capture the non-linearity of the data, indicating that non-linear regression methods may fit the relationship better.
 
-Polynomial regression initially follows the trend but ultimately performs poorly, indicated by its lower R² of 0.48. The linear model performs worst, failing to capture the non-linearity of the data. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. This analysis highlights that non-linear models, particularly power law and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates.
+Polynomial regression initially follows the trend but ultimately performs poorly, indicated by its lower R² of 0.48. Exponential and logarithmic regression perform well (R² = 0.61 and 0.56, respectively), capturing the steep initial decline before stabilizing at lower mortality levels. The power law model achieves the best fit with an R² of 0.61, revealing that 61% of the variance in infant mortality rates is explained by healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 10.47, supporting the inverse relationship shown in Figure 5.
+
+This analysis proves that non-linear models, particularly power law and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates.
 
 \newpage
 
@@ -427,7 +423,7 @@ plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="
 plt.show()
 ```
 
-The residual plot (Figure 7) for the power law regression model highlights some issues with the model’s fit. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity—where the variance of residuals increases as fitted values increase. This indicates that the model performs well at lower levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. The presence of extreme residuals also suggests potential outliers influencing the model. To address these issues, applying a log transformation to the dependent variable or deploying alternative regression techniques, such as Generalized Least Squares (GLS), may help improve the model’s fit.
+The residual plot (Figure 7) for the power law regression model highlights some issues with the model’s fit. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This shows that the model performs well at small levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. The presence of extreme residuals suggests potential outliers influencing the model. To address these issues, applying a log transformation to the dependent variable or deploying alternative regression techniques, such as Generalized Least Squares (GLS), may help improve the model’s fit.
 
 **Time Series Analysis**
 
@@ -475,9 +471,9 @@ fig.tight_layout()
 plt.show()
 ```
 
-Figure 8 illustrates the negative association between mean infant mortality rates (IMR) and mean healthcare expenditureing (USD) from 2000 to 2022. The trend indicates a continual drop in IMR, reflecting improvements in healthcare, economic development, and medical advances. Meanwhile, healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services.
+Figure 8 supports the non-linear negative association between mean infant mortality rates (IMR) and mean healthcare expenditureing (USD) from 2000 to 2022. The trend indicates a continual drop in IMR, reflecting improvements in healthcare, economic development, and medical advances. Meanwhile, healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services.
 
-A noteworthy anomaly arises in 2022 when healthcare expenditures significantly increase and infant death rates significantly decrease. This large shift may be due to pandemic-related expenditure, emergency health interventions, or data errors. The high rise in expenditure may signal a significant policy shift, but further research is needed to assess the long-term consequences.
+A noteworthy anomaly arises in 2022 when healthcare expenditures significantly increase and infant death rates significantly decrease. This large shift is likely due to pandemic-related expenditure, emergency health interventions, or data errors. The increased rise in expenditure may signal a significant policy shift, but further research is needed to assess the long-term consequences.
 
 Overall, Figure 8 reinforces the strong negative correlation between healthcare expenditure and infant mortality rates illustrated by Figures 5 and 6. However, the presence of diminishing returns suggests that beyond a certain threshold, additional expenditure may not yield proportional improvements, emphasising the need for efficient resource allocation and targeted healthcare policies to maximize impact.
 
