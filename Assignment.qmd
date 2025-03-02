@@ -7,6 +7,8 @@ execute:
     warning: false
     message: false
     results: false
+header-includes:
+    - \usepackage{float}   
 ---
 
 ```{python}
@@ -111,10 +113,12 @@ print(f"Total missing observations in Health_Data: {missing_values_Health}")
 missing_values_Infant = Infant_Data_long.isna().sum().sum()
 print(f"Total missing observations in Infant_Data: {missing_values_Infant}")
 
+
 # Create a dataframe showing the number of missing values for each dataset
 missing_values_table = pd.DataFrame({
-    'Dataset': ['Health_Data', 'Infant_Data'],
-    'Total Missing Observations': [missing_values_Health, missing_values_Infant]
+    'Dataset': ['Health Expenditure Dataset', 'Infant Mortality Rate Dataset'],
+    'Total Missing Observations': [missing_values_Health, missing_values_Infant],
+    'Missing Observations (%)': [((missing_values_Health / len(Health_Data_long)) *100).round(1), ((missing_values_Infant / len(Infant_Data_long)) *100).round(1)]
 })
 ```
 
@@ -140,12 +144,27 @@ The join completed in the above code chunk is an inner join and only keeps rows 
 
 ### Question 4 - Investigating the Relationship Between Current Healthcare Expenditure per Capita and Infant Mortality Rates from 2000 - 2022
 
-**Missing Data - Table 1**
+**Missing Data**
 
 ```{python}
-# Output the table with counts of missing values
-missing_values_table
+
+# Convert DataFrame to LaTeX format
+latex_table = missing_values_table.to_latex(index=False,
+                                            caption="Missing Observations of Variables",
+                                            label="Table 3:missings",
+                                            column_format="|l|r|r|",
+                                            escape=False)
+
+# Ensure correct LaTeX table format
+latex_table = latex_table.replace("\\begin{table}", "\\begin{table}[H]")
+
+
+# Save the modified LaTeX table
+with open("missing_table.tex", "w") as f:
+    f.write(latex_table)
 ```
+
+\input{missing_table.tex}
 
 Both datasets contained a considerable amount of missing data, illustrated in Table 1. Potentially due to countries not collecting the data or collecting the data at different year intervals. Missing data can have a large impact on data analysis if not handled properly and can lead to skewed or incorrect conclusions. The year 2023 contained no data; therefore, this column was dropped. To deal with the other missing data, I decided to drop all rows containing missing data, sometimes, this could result in a significant reduction of sample size; however, in this case, 1099 observations were removed (21.1% of the dataset) and only 27 countries were dropped, indicating this was an effective method to handling missing data as there were still 4109 observations. An alternative approach would’ve been mean, multiple or regression imputation if dropping rows with missing data caused a significant decrease in sample size.
 
@@ -175,10 +194,10 @@ cleaned_data['Heathcare Expenditure (USD)'] = cleaned_data['Heathcare Expenditur
 cleaned_data['Infant Mortality Rates (per 1,000 live births)'] = cleaned_data['Infant Mortality Rates (per 1,000 live births)'].astype(float).round(3)
 ```
 
-**Summary Statistics - Table 2**
+**Summary Statistics**
 
 ```{python}
-## Compute summary statistics
+#Compute summary statistics
 summary_stats = cleaned_data.describe().transpose()
 summary_stats = summary_stats[['count', 'mean', '50%', 'std', 'min', 'max']]
 summary_stats.columns = ['N', 'Mean', 'Median', 'SD', 'Min', 'Max']
@@ -187,8 +206,24 @@ summary_stats.index.name = "Variable"
 # Round values for better readability and format as strings for LaTeX output
 summary_stats = summary_stats.round(1).astype(str)
 
-summary_stats
+# Convert index to column for better formatting
+summary_stats.reset_index(inplace=True)
+
+# Convert table to LaTeX format with formatting
+latex_table = summary_stats.to_latex(index=False,
+                                     caption="Summary Statistics of Variables",
+                                     label="Table 2:summary_stats",
+                                     column_format="lrrrrrr",
+                                     escape=False)
+
+latex_table = latex_table.replace("\\begin{table}", "\\begin{table}[H]")
+
+# Save to a LaTeX file
+with open("summary_table.tex", "w") as f:
+    f.write(latex_table)
 ```
+
+\input{summary_table.tex}
 
 Table 2 displays the summary statistics for healthcare expenditure (USD) and infant mortality rates (per 1,000 live births) across 4109 observations, revealing significant differences between countries.
 
@@ -198,7 +233,6 @@ Infant mortality rates show similar variation, with a mean of 26.9 deaths per 1,
 
 Finally, the data indicates global differences in healthcare investments and mortality rates, suggesting that higher healthcare expenditure may be linked to lower infant mortality.
 
-\newpage
 
 **Distribution Analysis**
 
