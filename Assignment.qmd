@@ -112,14 +112,6 @@ print(f"Total missing observations in Health_Data: {missing_values_Health}")
 
 missing_values_Infant = Infant_Data_long.isna().sum().sum()
 print(f"Total missing observations in Infant_Data: {missing_values_Infant}")
-
-
-# Create a dataframe showing the number of missing values for each dataset
-missing_values_table = pd.DataFrame({
-    'Dataset': ['Health Expenditure Dataset', 'Infant Mortality Rate Dataset'],
-    'Total Missing Observations': [missing_values_Health, missing_values_Infant],
-    'Missing Observations (%)': [((missing_values_Health / len(Health_Data_long)) *100).round(1), ((missing_values_Infant / len(Infant_Data_long)) *100).round(1)]
-})
 ```
 
 **(e) Join the two files by country and year so that you have single dataframe containing both variables. Explain clearly what type of join this is, and carefully check that the number of observations resulting from the join makes sense.**
@@ -148,20 +140,40 @@ The join completed in the above code chunk is an inner join and only keeps rows 
 
 ```{python}
 
+# Create a dataframe showing the number of missing values for each dataset
+missing_values_table = pd.DataFrame({
+    'Dataset': ['Health Expenditure Dataset', 'Infant Mortality Rate Dataset'],
+    'Total Missing Observations': [missing_values_Health, missing_values_Infant],
+    'Percentage of Missing Observations': [
+        round((missing_values_Health / len(Health_Data_long)) * 100, 1),
+        round((missing_values_Infant / len(Infant_Data_long)) * 100, 1)
+    ]
+})
+
+# Ensure percentages are rounded properly and formatted as strings
+missing_values_table['Percentage of Missing Observations'] = missing_values_table['Percentage of Missing Observations'].apply(lambda x: f"{x:.1f}")
+
 # Convert DataFrame to LaTeX format
 latex_table = missing_values_table.to_latex(index=False,
                                             caption="Missing Observations of Variables",
-                                            label="Table 3:missings",
-                                            column_format="|l|r|r|",
+                                            label="Table 1:missings",
+                                            column_format="lrr",
                                             escape=False)
 
-# Ensure correct LaTeX table format
+
+# Ensure correct table float positioning
 latex_table = latex_table.replace("\\begin{table}", "\\begin{table}[H]")
 
+# Insert table counter reset before the table
+latex_reset = "\\setcounter{table}{0}\n"
 
-# Save the modified LaTeX table
+# Append reset command to LaTeX table
+latex_table = latex_reset + latex_table
+
+# Save LaTeX table with reset command
 with open("missing_table.tex", "w") as f:
     f.write(latex_table)
+
 ```
 
 \input{missing_table.tex}
