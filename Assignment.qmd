@@ -608,4 +608,5 @@ Regional disparities are present, with high-income regions investing more per ca
 
 While healthcare expenditure is an important driver of infant mortality rates, efficient allocation, accessibility, and policy effectiveness remain key determinants of long-term health improvements worldwide.
 
-### Link to GitHub Repository = https://github.com/JoshLG18/DSE-Assignment1
+
+[Link to Github Repository = BEE2041 Data Science in Economics Assignment](https://github.com/JoshLG18/DSE-Assignment1)
