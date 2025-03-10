@@ -24,7 +24,7 @@ from sklearn.preprocessing import PolynomialFeatures, QuantileTransformer
 
 ```
 
-### Question 3 - See QMD for Code
+### Question 3 - See .qmd for all code
 
 **(a) Import each dataset into memory as a separate data frame, keeping all countries as your sample.**
 
@@ -129,7 +129,7 @@ print(f"Number of rows in the DataFrame: {num_rows}")
 
 ```
 
-The join completed in the above code chunk is an inner join and only keeps rows that exist in both Health_Data_long and Infant_Data_long. If a country-year exists in one dataset but not the other, it will be dropped.
+The join completed in the above code chunk is an inner join and only keeps rows that exist in both Health_Data_long and Infant_Data_long. If a country or year exists in one dataset but not the other, it will be dropped.
 
 \newpage
 
@@ -141,7 +141,7 @@ The join completed in the above code chunk is an inner join and only keeps rows 
 
 # Create a dataframe showing the number of missing values for each dataset
 missing_values_table = pd.DataFrame({
-    'Dataset': ['Health Expenditure Dataset', 'Infant Mortality Rate Dataset'],
+    'Varible': ['Health Expenditure', 'Infant Mortality Rate'],
     'Total Missing Observations': [missing_values_Health, missing_values_Infant],
     'Percentage of Missing Observations': [
         round((missing_values_Health / len(Health_Data_long)) * 100, 1),
@@ -177,7 +177,7 @@ with open("missing_table.tex", "w") as f:
 
 \input{missing_table.tex}
 
-Both datasets contained a large amount of missing data, illustrated in Table 1. Potentially due to countries not collecting the data or collecting the data at different year intervals. Missing data can have a large impact on data analysis if not handled properly and can lead to skewed or incorrect conclusions. The year 2023 contained no data; therefore, this column was dropped. To deal with the other missing data, I decided to drop all rows containing missing data, sometimes, this could result in a significant reduction of sample size; however, in this case with observational data, 1099 observations were removed (21.1% of the dataset) and only 27 countries were dropped, indicating this was an effective method to handling missing data as there were still 4109 observations. An alternative approach would’ve been mean, multiple or regression imputation if dropping rows with missing data caused a significant decrease in sample size.
+Both datasets contained a large amount of missing data, illustrated in Table 1. Potentially due to countries not collecting the data or collecting the data at different year intervals. Missing data can have an impact on data analysis if not handled properly and can lead to incorrect conclusions. The year 2023 contained no data; therefore, this column was dropped. To deal with the other missing data, I decided to drop all rows containing missing data, sometimes, this could result in a significant reduction of sample size; however, in this case with observational data, 1099 observations were removed (21.1% of the dataset) and only 27 countries were dropped, indicating this was an effective method to handling missing data as there were still 4109 observations. An alternative approach would’ve been mean, multiple or regression imputation if dropping rows with missing data caused a significant decrease in sample size.
 
 ```{python}
 # Removing any rows with missing data to clean the dataset
@@ -282,15 +282,13 @@ plt.rcParams.update({'font.size': 14})
 
 ```
 
-The distribution of the infant mortality rate (per 1,000 live births) seen in Figures 3 and 4 is similar to that of healthcare expenditure per capita (USD).
+The distribution of infant mortality rate seen in Figures 3 and 4 is similar to that of healthcare expenditure per capita.
 
-There are several outliers in Figure 3, with specific countries having abnormally high infant mortality rates. The variable is again negatively skewed, as seen by the median being significantly lower than the upper quartile.
+The variable is also negatively skewed, as seen by the median being significantly lower than the upper quartile. There are several outliers in Figure 3, with specific countries having abnormally high infant mortality rates.
 
-This is supported by Figure 4, which displays a dramatic fall in frequency as rates rise, with most values clustering below 40 deaths per 1,000 live births. While infant mortality is low in many nations, it is much higher in others, most likely because of infrastructural constraints, economic considerations, and healthcare discrepancies.
+This is supported by Figure 4, which displays that as rates rise frequency falls dramatically, the majority of observations being below 40 deaths per 1,000 live births. While infant mortality is low in many nations, it is much higher in others, most likely because of infrastructural constraints, economic considerations, and healthcare discrepancies. This may indicate a causal relationship between healthcare expenditure per capita and infant mortality rate needing investigation.
 
-Due to the number of outliers within both variables, I decided to use the Interquartile Range (IQR) method to remove any outliers to ensure the regression analysis is more reliable and accurate.
-
-Outliers may skew the models fit and influence regression coefficients, inflating evaluation metrics such as mean absolute error (MAE). By applying the IQR method, the data represents a more consistent trend, reducing the impact of extreme values and improving the model's ability to capture the true relationship between healthcare expenditure and infant mortality rates.
+Due to the number of outliers within both variables, I decided to use the Interquartile Range (IQR) method to remove any outliers to ensure the regression analysis is more reliable and accurate. Outliers may skew the models fit and influence regression coefficients, inflating evaluation metrics such as mean absolute error (MAE). By applying the IQR method, the data represents a more consistent trend, reducing the impact of extreme values and improving the model's ability to capture the true relationship between healthcare expenditure and infant mortality rates.
 
 ```{python}
 # Removing Outliers
@@ -336,7 +334,7 @@ plt.figtext(0.5, -1.05, "Figure 5: Spearman Rank Correlation Matrix of Healthcar
 plt.show()
 ```
 
-Figure 5 illustrates the relationship between healthcare expenditure and infant mortality rates. The correlation coefficient of -0.82 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates to decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved care, and reduced infant deaths. Spearman's rank correlation is used as it captures non-linear relationships, making it more robust. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could be confounders in this relationship.
+Figure 5 illustrates the relationship between healthcare expenditure per capita and infant mortality rates. The correlation coefficient of -0.82 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates to decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved care, and reduced infant deaths. Spearman's rank correlation is used as it captures non-linear relationships, making it more robust. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could be confounders in this relationship.
 
 **Regression Analysis**
 
@@ -462,7 +460,7 @@ plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="
 plt.show()
 ```
 
-The residuals, illustrated by Figure 7, for the power law regression model indicates some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This shows that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to the dependent variable or using alternative regression techniques may help improve the model’s fit.
+The residuals, illustrated by Figure 7, for the power law regression model indicate some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This means that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to the dependent variable or using alternative regression techniques may help improve the model’s fit.
 
 \newpage
 
@@ -512,12 +510,12 @@ fig.tight_layout()
 plt.show()
 ```
 
-Figure 8 illustrates the non-linear negative association between mean infant mortality rates (IMR) and mean healthcare expenditureing (USD) from 2000 to 2022. The trend indicates healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services. Leading to a continual drop in IMR, reflecting these improvements in healthcare, economic development, and medical advances
+Figure 8 illustrates the non-linear negative association between mean infant mortality rates (IMR) and mean healthcare expenditure from 2000 to 2022. The trend indicates healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services. Leading to a continual drop in IMR, reflecting these improvements in healthcare, economic development, and medical advances
 
 An anomaly occurs in 2022 when healthcare expenditure increases disproportionately to other years and infant death rates significantly decrease. This large increases is likely due to pandemic-related expenditure, emergency health interventions, or data errors.
 
 ```{python}
-plt.rcParams.update({'font.size': 55})
+plt.rcParams.update({'font.size': 55}) #changes the size of the text in plots
 
 
 # Load in dataset with countries and continents
@@ -586,7 +584,7 @@ plt.rcParams.update({'font.size': 14})
 
 ```
 
-Figure 9 shows continent-specific relationships between IMR and mean healthcare expenditure (USD) from 2000 to 2022. The constant negative relationship across all continents reiterates that increasing healthcare investment has the potential to reduce infant mortality.
+Figure 9 shows continent-specific relationships between mean IMR and mean healthcare expenditure from 2000 to 2022. The negative relationship across all continents reiterates that increasing healthcare investment has the potential to reduce infant mortality.
 
 Asia and Africa have had considerable decreases in IMR, indicating substantial improvements in healthcare despite relatively small expenditure. Europe and North America, with larger starting expenditures, experienced lower IMR decreases, indicating diminishing returns on investment.
 
@@ -594,7 +592,7 @@ Healthcare expenditure rose significantly in 2022 in Europe and South America, p
 
 **Conclusion**
 
-In conclusion, there is a strong non-linear negative relationship between healthcare expenditure and infant mortality rates across global regions. Countries with higher healthcare investment generally experience lower infant mortality, though the impact varies based on economic and healthcare infrastructure factors.
+In conclusion, there is a strong non-linear negative relationship between healthcare expenditure and infant mortality rates. Countries with higher healthcare investment generally experience lower infant mortality, though the impact varies based on economic and healthcare infrastructure factors.
 
 The non-linear nature of this relationship indicates diminishing returns, where initial increases in spending lead to substantial improvements, but further investments yield smaller reductions in infant mortality. Regression and time-series analyses further reinforce this pattern, indicating long-term declines in infant mortality alongside growing healthcare expenditure.
 
