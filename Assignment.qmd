@@ -20,8 +20,7 @@ from scipy.stats import pearsonr
 from scipy.optimize import curve_fit
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, r2_score
-from sklearn.preprocessing import PolynomialFeatures, QuantileTransformer
-
+from sklearn.preprocessing import PolynomialFeatures
 ```
 
 ### Question 3 - See .qmd for all code
@@ -126,7 +125,6 @@ print(merged_data.head())
 # Print the number of rows in the DataFrame
 num_rows = merged_data.shape[0]
 print(f"Number of rows in the DataFrame: {num_rows}")
-
 ```
 
 The join completed in the above code chunk is an inner join and only keeps rows that exist in both Health_Data_long and Infant_Data_long. If a country or year exists in one dataset but not the other, it will be dropped.
@@ -159,7 +157,6 @@ latex_table = missing_values_table.to_latex(index=False,
                                             column_format="lrr",
                                             escape=False)
 
-
 # Ensure correct table float positioning
 latex_table = latex_table.replace("\\begin{table}", "\\begin{table}[H]")
 
@@ -172,7 +169,6 @@ latex_table = latex_reset + latex_table
 # Save LaTeX table with reset command
 with open("missing_table.tex", "w") as f:
     f.write(latex_table)
-
 ```
 
 \input{missing_table.tex}
@@ -259,7 +255,7 @@ plt.xlabel("Healthcare expenditure Per Capita (USD)")
 plt.show()
 ```
 
-Figures 1 and 2 show the distribution of healthcare expenditure per capita (USD). Figure 1 shows that healthcare expenditure is highly negatively skewed, supporting the analysis from the summary statistics. The median expenditure is toward the lowers quartile, indicating that most countries have relatively little expenditure, while a few have significantly higher spending. The whiskers of the box plot are short, suggesting that a large proportion of the data is concentrated within a lower range, while the numerous outliers highlight extreme expenditure levels in some countries.
+Figures 1 and 2 show the distribution of healthcare expenditure per capita. Figure 1 shows that healthcare expenditure is highly negatively skewed, supporting the analysis from the summary statistics. The median expenditure is toward the lowers quartile, indicating that most countries have relatively little expenditure, while a few have significantly higher spending. The whiskers of the box plot are short, suggesting that a large proportion of the data is concentrated within a lower range, while the numerous outliers highlight extreme expenditure levels in some countries.
 
 Figure 2 reiterates the negative skew of the data. Most countries have low healthcare expenditure, grouped toward the left of the axis, with just a handful having exceptionally high expenditures. The density curve (smooth blue line) shows the exponential drop in frequency as expenditure increases, emphasising that high-spending countries are exceptions rather than the rule.
 
@@ -316,7 +312,6 @@ cleaned_data = cleaned_data[
     (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] >= lower_bound_infant_mortality) &
     (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] <= upper_bound_infant_mortality)
 ]
-
 ```
 
 **Correlation Analysis**
@@ -581,7 +576,6 @@ plt.figtext(0.5, -0.01, "Figure 9: Time Series Analysis of Mean Infant Mortality
 plt.tight_layout()
 plt.show()
 plt.rcParams.update({'font.size': 14})
-
 ```
 
 Figure 9 shows continent-specific relationships between mean IMR and mean healthcare expenditure from 2000 to 2022. The negative relationship across all continents reiterates that increasing healthcare investment has the potential to reduce infant mortality.
@@ -601,3 +595,20 @@ Regional disparities are present, with high-income regions investing more per ca
 While healthcare expenditure is an important driver of infant mortality rates, efficient allocation, accessibility, and policy effectiveness remain key determinants of long-term health improvements worldwide.
 
 [Link to Github Repository = BEE2041 Data Science in Economics Assignment](https://github.com/JoshLG18/DSE-Assignment1)
+
+
+
+```{python}
+# Concatonate PDF Files
+from pypdf import PdfWriter
+
+pdfs = ['Q1+2.pdf', 'Assignment.pdf']
+
+merger = PdfWriter()
+
+for pdf in pdfs:
+    merger.append(pdf)
+
+merger.write("Answers.pdf")
+merger.close()
+```
