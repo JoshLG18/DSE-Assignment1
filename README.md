@@ -17,5 +17,6 @@ What is in this repository:
 - Answers.pdf contains all the answers for the questions
 - Assignment.qmd contains all the code for questions 3 + 4
 - Assignment.pdf contains the complied pdf from questions 3 + 4
+- Q1+2.pdf contains the complied pdf from questions 1 + 2
 - .tex files conatin the latex code for tables within the report
 - data.zip contains all the data used in the project
