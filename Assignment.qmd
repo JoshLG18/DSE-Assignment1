@@ -308,6 +308,7 @@ Figure 5 illustrates the relationship between healthcare expenditure per capita 
 X = cleaned_data["Heathcare Expenditure (USD)"].to_numpy(float)
 y = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].to_numpy(float)
 
+# Log Transformations
 y = np.log10(y)
 
 # Create X values for smooth curve plotting
@@ -421,7 +422,7 @@ plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="
 plt.show()
 ```
 
-The residuals, illustrated by Figure 7, for the logarithmic regression model indicate some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This means that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to the independent variable or using alternative regression techniques may help improve the model’s fit.
+The residuals, illustrated by Figure 7, for the logarithmic regression model indicate some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This means that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to both variables or using alternative regression techniques may help improve the model’s fit.
 
 \newpage
 
