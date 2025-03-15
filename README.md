@@ -18,10 +18,12 @@ What is in this repository:
 - Assignment.qmd contains all the code for questions 3 + 4
 - Assignment.pdf contains the complied pdf from questions 3 + 4
 - Q1+2.pdf contains the complied pdf from questions 1 + 2
-- .tex files conatin the latex code for tables within the report
 - data.zip contains all the data used in the project
+- Tables/ = contains .tex files conatining the latex code for tables within the report
+- PDF_Files/ = contains all the pdf files used to create Answers.pdf
 
 How to replicate the results:
 - Download the data.zip file and extract the contents
+- Run the Assignment.qmd file to get the results for questions 3 + 4 = Assignment.pdf
 - Use the code screenshots within the Answers.pdf to replicate the results for questions 1 + 2
-- Run the Assignment.qmd file to get the results for questions 3 + 4
+- Run the Assignment.qmd to create Answers.pdf from Q1+2.pdf and Assignment.pdf

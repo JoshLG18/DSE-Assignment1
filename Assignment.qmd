@@ -171,7 +171,7 @@ with open("missing_table.tex", "w") as f:
     f.write(latex_table)
 ```
 
-\input{missing_table.tex}
+\input{Tables/missing_table.tex}
 
 Both datasets contained a large amount of missing data, illustrated in Table 1. Potentially due to countries not collecting the data or collecting the data at different year intervals. Missing data can have an impact on data analysis if not handled properly and can lead to incorrect conclusions. The year 2023 contained no data; therefore, this column was dropped. To deal with the other missing data, I decided to drop all rows containing missing data, sometimes, this could result in a significant reduction of sample size; however, in this case with observational data, 1099 observations were removed (21.1% of the dataset) and only 27 countries were dropped, indicating this was an effective method to handling missing data as there were still 4109 observations. An alternative approach would’ve been mean, multiple or regression imputation if dropping rows with missing data caused a significant decrease in sample size.
 
@@ -231,7 +231,7 @@ with open("summary_table.tex", "w") as f:
     f.write(latex_table)
 ```
 
-\input{summary_table.tex}
+\input{Tables/summary_table.tex}
 
 Table 2 displays the summary statistics for healthcare expenditure (USD) and infant mortality rates (per 1,000 live births) across 4109 observations, revealing significant differences between countries.
 
@@ -568,7 +568,7 @@ While healthcare expenditure is an important driver of infant mortality rates, e
 # Concatonate PDF Files
 from pypdf import PdfWriter
 
-pdfs = ['Q1+2.pdf', 'Assignment.pdf']
+pdfs = ['PDF_Files/Q1+2.pdf', 'PDF_Files/Assignment.pdf']
 
 merger = PdfWriter()
 
