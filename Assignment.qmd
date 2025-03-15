@@ -308,6 +308,7 @@ Figure 5 illustrates the relationship between healthcare expenditure per capita 
 X = cleaned_data["Heathcare Expenditure (USD)"].to_numpy(float)
 y = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].to_numpy(float)
 
+y = np.log10(y)
 
 # Create X values for smooth curve plotting
 X_range = np.linspace(min(X), max(X)).reshape(-1, 1)
@@ -335,10 +336,6 @@ poly_model = LinearRegression().fit(X_poly, y) # fits the model using linear reg
 # Get predictions and enforce a non-increasing trend
 y_pred_poly = poly_model.predict(X_poly)
 y_pred_poly_plot = poly_model.predict(X_range_poly)
-
-# Ensure polynomial predictions do not increase after reaching zero
-y_pred_poly_plot[y_pred_poly_plot < 0] = 0  # Prevent negative values
-y_pred_poly_plot[np.diff(y_pred_poly_plot, prepend=y_pred_poly_plot[0]) > 0] = 0  # Prevent increasing trend
 
 # Generate performance metrics
 r2_poly = r2_score(y, y_pred_poly)
@@ -397,14 +394,14 @@ plt.plot(X_range, y_pred_lin_plot, color="orange", linestyle="dashed", label=f"L
 
 plt.figtext(0.5, -0.01, "Figure 6: Comparison of Regression Models: Healthcare Spend vs Infant Mortality Rate", ha="center", fontsize=11)
 plt.xlabel("Healthcare expenditure Per Capita (USD)")
-plt.ylabel("Infant Mortality Rate")
+plt.ylabel("log10(Infant Mortality Rate)")
 plt.legend()
 plt.show()
 ```
 
-Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. The linear model performs worst (R² = 0.21), not capturing the non-linearity of the data, indicating that non-linear regression methods may fit the relationship better.
+Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. A log10 transformation was performed to deal with the skewness of the data and reduce heteroscedasticity. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. The linear model performs worst (R² = 0.45), not capturing the non-linearity of the data, indicating that non-linear regression methods may fit the relationship better.
 
-Polynomial regression initially follows the relationship but overall performs poorly, shown by its lower R² of 0.33. Exponential and logarithmic regression perform well (R² = 0.62 and 0.66, respectively), capturing the steep initial decline in infant mortality rates before plateauing at higher expenditure levels. The power law model achieves the best fit with an R² of 0.68, revealing that 68% of the variance in infant mortality rates is due to healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 10.03.
+Polynomial regression initially follows the relationship but overall performs poorly, shown by its lower R² of 0.62. Exponential and Power Law regression perform well (R² = 0.64 and 0.74, respectively), capturing the steep initial decline in infant mortality rates before plateauing at higher expenditure levels. The logarithmic model achieves the best fit with an R² of 0.78, revealing that 78% of the variance in infant mortality rates is due to healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 0.17.
 
 This analysis proves that non-linear models, particularly power law and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates shown by Figure 5.
 
@@ -424,7 +421,7 @@ plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="
 plt.show()
 ```
 
-The residuals, illustrated by Figure 7, for the power law regression model indicate some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This means that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to the dependent variable or using alternative regression techniques may help improve the model’s fit.
+The residuals, illustrated by Figure 7, for the logarithmic regression model indicate some issues with fit of the model. The residuals display a clear pattern rather than being randomly scattered around 0, suggesting heteroscedasticity, where the variance of residuals increases as fitted values increase. This means that the model performs well at low levels of healthcare expenditure but struggles to maintain accuracy as expenditure increases. To address these issues, applying a log transformation to the independent variable or using alternative regression techniques may help improve the model’s fit.
 
 \newpage
 
