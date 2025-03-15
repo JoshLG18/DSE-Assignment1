@@ -418,7 +418,7 @@ plt.scatter(y_pred_pow, residuals, alpha=0.5)
 plt.axhline(0, color='red', linestyle='--')
 plt.xlabel('Fitted values')
 plt.ylabel('Residuals')
-plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Power Law Regression ", ha="center", fontsize=11)
+plt.figtext(0.5, -0.07, "Figure 7: Residual Plot of Logarithmic Regression ", ha="center", fontsize=11)
 plt.show()
 ```
 
