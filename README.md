@@ -20,3 +20,8 @@ What is in this repository:
 - Q1+2.pdf contains the complied pdf from questions 1 + 2
 - .tex files conatin the latex code for tables within the report
 - data.zip contains all the data used in the project
+
+How to replicate the results:
+- Download the data.zip file and extract the contents
+- Use the code screenshots within the Answers.pdf to replicate the results for questions 1 + 2
+- Run the Assignment.qmd file to get the results for questions 3 + 4

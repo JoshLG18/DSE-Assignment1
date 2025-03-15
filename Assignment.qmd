@@ -139,7 +139,7 @@ The join completed in the above code chunk is an inner join and only keeps rows 
 
 # Create a dataframe showing the number of missing values for each dataset
 missing_values_table = pd.DataFrame({
-    'Varible': ['Health Expenditure', 'Infant Mortality Rate'],
+    'Variable': ['Health Expenditure', 'Infant Mortality Rate'],
     'Total Missing Observations': [missing_values_Health, missing_values_Infant],
     'Percentage of Missing Observations': [
         round((missing_values_Health / len(Health_Data_long)) * 100, 1),
@@ -284,36 +284,6 @@ The variable is also positively skewed, as seen by the median being significantl
 
 This is supported by Figure 4, which displays that as rates rise frequency falls dramatically, the majority of observations being below 40 deaths per 1,000 live births. While infant mortality is low in many nations, it is much higher in others, most likely because of infrastructural constraints, economic considerations, and healthcare discrepancies. This may indicate a causal relationship between healthcare expenditure per capita and infant mortality rate needing investigation.
 
-Due to the number of outliers within both variables, I decided to use the Interquartile Range (IQR) method to remove any outliers to ensure the regression analysis is more reliable and accurate. Outliers may skew the models fit and influence regression coefficients, inflating evaluation metrics such as mean absolute error (MAE). By applying the IQR method, the data represents a more consistent trend, reducing the impact of extreme values and improving the model's ability to capture the true relationship between healthcare expenditure and infant mortality rates.
-
-```{python}
-# Removing Outliers
-
-# Calculate the IQR for Healthcare Expenditure and Infant Mortality Rates
-Q1_healthcare = cleaned_data["Heathcare Expenditure (USD)"].quantile(0.25)
-Q3_healthcare = cleaned_data["Heathcare Expenditure (USD)"].quantile(0.75)
-IQR_healthcare = Q3_healthcare - Q1_healthcare
-
-Q1_infant_mortality = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].quantile(0.25)
-Q3_infant_mortality = cleaned_data["Infant Mortality Rates (per 1,000 live births)"].quantile(0.75)
-IQR_infant_mortality = Q3_infant_mortality - Q1_infant_mortality
-
-# Define the lower and upper bounds for outliers
-lower_bound_healthcare = Q1_healthcare - 1.5 * IQR_healthcare
-upper_bound_healthcare = Q3_healthcare + 1.5 * IQR_healthcare
-
-lower_bound_infant_mortality = Q1_infant_mortality - 1.5 * IQR_infant_mortality
-upper_bound_infant_mortality = Q3_infant_mortality + 1.5 * IQR_infant_mortality
-
-# Filter the dataset to remove outliers
-cleaned_data = cleaned_data[
-    (cleaned_data["Heathcare Expenditure (USD)"] >= lower_bound_healthcare) &
-    (cleaned_data["Heathcare Expenditure (USD)"] <= upper_bound_healthcare) &
-    (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] >= lower_bound_infant_mortality) &
-    (cleaned_data["Infant Mortality Rates (per 1,000 live births)"] <= upper_bound_infant_mortality)
-]
-```
-
 **Correlation Analysis**
 
 ```{python}
@@ -329,7 +299,7 @@ plt.figtext(0.5, -1.05, "Figure 5: Spearman Rank Correlation Matrix of Healthcar
 plt.show()
 ```
 
-Figure 5 illustrates the relationship between healthcare expenditure per capita and infant mortality rates. The correlation coefficient of -0.82 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates to decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved care, and reduced infant deaths. Spearman's rank correlation is used as it captures non-linear relationships, making it more robust. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could be confounders in this relationship.
+Figure 5 illustrates the relationship between healthcare expenditure per capita and infant mortality rates. The correlation coefficient of -0.88 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved care, and reduced infant deaths. Spearman's rank correlation is used as it captures non-linear relationships, making it more robust. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could be confounders in this relationship.
 
 **Regression Analysis**
 
@@ -432,16 +402,15 @@ plt.legend()
 plt.show()
 ```
 
-Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. The linear model performs worst (R² = 0.33), not capturing the non-linearity of the data, indicating that non-linear regression methods may fit the relationship better.
+Figure 6 compares five regression models; exponential, polynomial, logarithmic, power law, and linear, in quantifying the relationship between healthcare expenditure per capita and infant mortality rates. All models are constrained to prevent infant mortality predictions below 0, ensuring a realistic representation. The linear model performs worst (R² = 0.21), not capturing the non-linearity of the data, indicating that non-linear regression methods may fit the relationship better.
 
-Polynomial regression initially follows the relationship but overall performs poorly, shown by its lower R² of 0.48. Exponential and logarithmic regression perform well (R² = 0.56 and 0.61, respectively), capturing the steep initial decline in infant mortality rates before plateauing at higher expenditure levels. The power law model achieves the best fit with an R² of 0.61, revealing that 61% of the variance in infant mortality rates is due to healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 10.47.
+Polynomial regression initially follows the relationship but overall performs poorly, shown by its lower R² of 0.33. Exponential and logarithmic regression perform well (R² = 0.62 and 0.66, respectively), capturing the steep initial decline in infant mortality rates before plateauing at higher expenditure levels. The power law model achieves the best fit with an R² of 0.68, revealing that 68% of the variance in infant mortality rates is due to healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 10.03.
 
 This analysis proves that non-linear models, particularly power law and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates shown by Figure 5.
 
 **Regression Model Evaluation**
 
 ```{python}
-
 # Calculate residuals
 residuals = y - y_pred_pow
 
@@ -512,10 +481,8 @@ An anomaly occurs in 2022 when healthcare expenditure increases disproportionate
 ```{python}
 plt.rcParams.update({'font.size': 55}) #changes the size of the text in plots
 
-
 # Load in dataset with countries and continents
 continents = pd.read_csv('Data/Continents.csv')
-
 
 # Join continents to cleaned data
 cleaned_data = pd.merge(cleaned_data, continents, left_on='Country Name', right_on='Country')
@@ -540,6 +507,7 @@ axes = axes.flatten()
 infant_mortality_min, infant_mortality_max = mean_data_by_continent['Mean Infant Mortality Rates (per 1,000 live births)'].min(), mean_data_by_continent['Mean Infant Mortality Rates (per 1,000 live births)'].max()
 healthcare_expenditure_min, healthcare_expenditure_max = mean_data_by_continent['Mean Healthcare Expenditure (USD)'].min(), mean_data_by_continent['Mean Healthcare Expenditure (USD)'].max()
 
+# Sets axis limits to max of each variable
 def set_axes_limits(ax, ax2):
     ax.set_ylim(infant_mortality_min, infant_mortality_max)
     ax2.set_ylim(healthcare_expenditure_min, healthcare_expenditure_max)
