@@ -301,6 +301,7 @@ plt.show()
 
 Figure 5 illustrates the relationship between healthcare expenditure per capita and infant mortality rates. The correlation coefficient of -0.88 indicates a strong negative correlation, suggesting that as healthcare expenditure increases, infant mortality rates decrease. This aligns with economic and public health expectations, where greater investment in healthcare typically leads to better medical infrastructure, improved care, and reduced infant deaths. Spearman's rank correlation is used as it captures non-linear relationships, making it more robust. However, correlation does not imply causation, and additional factors such as healthcare efficiency, socioeconomic disparities, and government policies could be confounders in this relationship.
 
+\newpage
 **Regression Analysis**
 
 ```{python}
@@ -404,7 +405,7 @@ Figure 6 compares five regression models; exponential, polynomial, logarithmic, 
 
 Polynomial regression initially follows the relationship but overall performs poorly, shown by its lower R² of 0.62. Exponential and Power Law regression perform well (R² = 0.64 and 0.74, respectively), capturing the steep initial decline in infant mortality rates before plateauing at higher expenditure levels. The logarithmic model achieves the best fit with an R² of 0.78, revealing that 78% of the variance in infant mortality rates is due to healthcare expenditure per capita, and the lowest mean absoloute error (MAE) of 0.17.
 
-This analysis proves that non-linear models, particularly power -am and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates shown by Figure 5.
+This analysis proves that non-linear models, particularly power law and logarithmic regression, provide the most accurate representation of the data, reiterating the non-linearity of the relationship between healthcare expenditure per capita and infant mortality rates shown by Figure 5.
 
 **Regression Model Evaluation**
 
@@ -472,7 +473,7 @@ fig.tight_layout()
 plt.show()
 ```
 
-Figure 8 illustrates the non-linear negative association between mean infant mortality rates (IMR) and mean healthcare expenditure from 2000 to 2022. The trend indicates healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services. Leading to a continual drop in IMR, reflecting these improvements in healthcare, economic development, and medical advances
+Figure 8 illustrates the non-linear negative association between mean infant mortality rates (IMR) and mean healthcare expenditure from 2000 to 2022. The trend indicates healthcare expenditure has steadily climbed, indicating greater investment in health infrastructure and services. Leading to a continual drop in IMR, reflecting these improvements in healthcare, economic development, and medical advances.
 
 An anomaly occurs in 2022 when healthcare expenditure increases disproportionately to other years and infant death rates significantly decrease. This large increases is likely due to pandemic-related expenditure, emergency health interventions, or data errors.
 
